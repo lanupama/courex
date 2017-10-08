@@ -1,0 +1,64 @@
+Some thoughts on the schema:
+
+An application which tracks deliveries needs to represent different points(nodes) in an pre-identified path or route.
+One way of modelling comes from viewing this as a graph theory problem. And
+Therefore designing a schema requires representing graphs.
+
+The application schema model comes from deterministic pre-computed paths
+paths are not calculated on a real time basis. Should some path parameter change, paths should be reconfigured statically.
+Given a Source and a destination any pair of nodes will have exactly one path.
+
+A) Used by the application itself. So these are precomputed shortest paths
+between two nodes. By shortest I mean it is a weighted directed graph
+(weight being determined by distance,cost and other attributes)
+ (a) 
+ For a Source A to destination B ideal destination would be to
+
+ A very naive version in a traditional RDBMS would be like
+
+  % All Orders 
+  (
+   OrderId, Primary Key
+   CustID,
+   Source-- Refers Nodes,
+   Dest--   Refers Nodes,
+   Current_Location-- Refers Nodes (represents current location of delivery) 
+   Path_id--Refers Path (Path_id represents the shortest path from A -> B 
+   )
+   
+  Master Table of all Nodes
+  Nodes(NodeId,Primary Key)
+
+  %Pre computed shortest paths
+  Shortest_Paths
+  (NodeS
+   PathId
+   NodeB) Primary Key (NodeS,PathId)
+
+
+So for example path A->C->D->G for Source A and Dest G for order ID 1 is
+uniquely identified by pathId 2 will have the folllowing entry
+
+   A  2  C
+   C  2  D
+   D  2  G
+
+   Of course this comes at the cost of redundancy with C->D-G having a separate
+   entry in the aboe table. That should not matter much. We could get around
+   that but I think it will be harder to find an algorithm to populate that
+   table.
+ 
+B) We could easily extend the path schema above with an additional cost
+   attribute  to store paths with increasing costs to falicitate
+   alternate routes .
+
+C) Of course unlike traditional databases other data stores maybe modern
+   document databases like MongoDB or graph databases where you could store
+   paths as list of vertices. I need to read up on that.
+   
+  
+
+  
+
+
+
